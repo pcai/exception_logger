@@ -39,7 +39,7 @@ module ExceptionLogger
         @exceptions = @exceptions.message_like(params[:query])
       end
       unless params[:date_ranges_filter].blank?
-        @exceptions = exceptions.days_old(params[:date_ranges_filter])
+        @exceptions = @exceptions.days_old(params[:date_ranges_filter])
       end
       unless params[:exception_names_filter].blank?
         @exceptions = @exceptions.by_exception_class(params[:exception_names_filter])
