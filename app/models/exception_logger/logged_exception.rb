@@ -2,14 +2,6 @@ module ExceptionLogger
   class LoggedException < ActiveRecord::Base
     # FIXME
     self.table_name = "logged_exceptions"
-    
-    attr_accessible :exception_class, 
-                    :controller_name, 
-                    :action_name, 
-                    :message, 
-                    :backtrace, 
-                    :request,
-                    :user_id
 
     class << self
       def create_from_exception(controller, exception, data, user)

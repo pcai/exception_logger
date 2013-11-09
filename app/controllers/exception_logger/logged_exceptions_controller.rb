@@ -10,6 +10,10 @@ module ExceptionLogger
                    #   self.creator = "User.current"
                    #   self.creator = "current_user"
                    :creator,
+				   
+				   # creator's class.
+				   :creator_class,
+				   
                    # A method that can be used to return a string value to
                    # be used by the views to display the Creator's information
                    #
@@ -31,7 +35,7 @@ module ExceptionLogger
     end
 
     def query
-      @exceptions = LoggedException.page(params[:page]).per(25).sorted
+      @exceptions = LoggedException.page(params[:page]).per_page(25).sorted
       unless params[:id].blank?
         @exceptions = @exceptions.where(:id => params[:id])
       end

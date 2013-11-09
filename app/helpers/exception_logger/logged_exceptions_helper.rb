@@ -40,9 +40,9 @@ module ExceptionLogger
     end
 
     def user_name(id)
+	  return "" if id.blank?
       begin
-        klass = ExceptionLogger::LoggedExceptionsController.creator
-        klass = send(klass.to_sym).class
+        klass = ExceptionLogger::LoggedExceptionsController.creator_class.constantize
         record = klass.find(id)
         fn = ExceptionLogger::LoggedExceptionsController.creator_name
         if record.respond_to?(fn)
