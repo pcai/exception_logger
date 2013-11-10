@@ -27,17 +27,17 @@ $(function () {
   
   ajax_headers(); 
   
-  $('.show_link').live('click', function(event) {
+  $('body').on('click', '.show_link', function(event) {
     $.get($(this).attr("href"));
     return false;
   }); 
   
-  $('.close_link').live('click', function(event) {
+  $('body').on('click', '.close_link', function(event) {
     $("#showpage").hide();
     return false;
   });
   
-  $('.delete_link').live('click', function(event) {
+  $('body').on('click', '.delete_link', function(event) {
     $.ajax({
       url: $(this).attr("href"),
       type: 'DELETE'
@@ -45,7 +45,7 @@ $(function () {
     return false;
   }); 
   
-  $('.delete_visible_link').live('click', function(event) {
+  $('body').on('click', '.delete_visible_link', function(event) {
     var arr=$('tr.exception').map(function() { var id = $(this).attr("id"); return parseInt(id.replace(/^\w+_/, '')); }).get();
     $.ajax({
       url: $(this).attr("href"),
@@ -56,7 +56,7 @@ $(function () {
     return false;
   }); 
   
-  $('.filter_link').live('click', function(event) {
+  $('body').on('click', '.filter_link', function(event) {
     $('.filter_link').removeClass('selected');
     $(this).addClass('selected');
     $.ajax({
@@ -67,7 +67,7 @@ $(function () {
     return false;
   });
   
-  $('#query-form :submit').live('click', function(event) {
+  $('body').on('click', '#query-form :submit', function(event) {
     $.ajax({
       url: $("#query-form").attr("action"),
       type: 'POST',
@@ -77,7 +77,7 @@ $(function () {
     return false;
   });
   
-  $(".pagination a").live("click", function() {
+  $('body').on("click", '.pagination a', function() {
     $.getScript(this.href);   
     return false;
   });
