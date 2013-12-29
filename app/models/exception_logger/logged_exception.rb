@@ -1,6 +1,9 @@
 module ExceptionLogger
   class LoggedException < ActiveRecord::Base
-    # FIXME
+	
+	attr_protected :id
+    
+	# FIXME
     self.table_name = "logged_exceptions"
 
     class << self
