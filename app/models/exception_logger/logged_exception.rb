@@ -1,5 +1,9 @@
 module ExceptionLogger
   class LoggedException < ActiveRecord::Base
+	
+	# force the table name even though it would normally be namespaced
+	self.table_name = 'logged_exceptions'
+	
     class << self
       def create_from_exception(controller, exception, data)
         message = exception.message.inspect
