@@ -4,6 +4,9 @@ module ExceptionLogger
 	# force the table name even though it would normally be namespaced
 	self.table_name = 'logged_exceptions'
 	
+	# for protected_attributes
+	attr_protected :id
+	
     class << self
       def create_from_exception(controller, exception, data)
         message = exception.message.inspect
