@@ -7,17 +7,18 @@ require "exception_logger/version"
 Gem::Specification.new do |s|
   s.name        = "exception_logger"
   s.version     = ExceptionLogger::VERSION
-  s.authors     = ["Roland Guem", "Alex Bevilacqua"]
-  s.email       = ["roland.guem@gmail.com", "alexbevi@gmail.com"]
-  s.homepage    = "http://github.com/alexbevi/exception_logger"
-  s.summary     = "Exception Logging Rails3 Engine"
-  s.description = "Logs exceptions inside a database table. Now available as an engine for Rails 3 (previously a plugin for Rails2)"
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["LICENSE", "Rakefile", "README.rdoc"]
+  s.authors     = ["Ryan Cheung"]
+  s.email       = ["ryancheung.go@gmail.com"]
+  s.homepage    = "https://github.com/ryancheung/exception_logger"
+  s.summary     = "Log exceptions inside a database table. No avaliable with rails 3.2.x."
+  s.description = "It's evolved from the outdated version 0.11.1 and built with rails engine and is mountable."
+
+  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "> 3.1.3"
-  s.add_dependency "will_paginate"
-  s.add_dependency "squeel"
+  s.add_dependency "rails", "~> 4.0.0"
+  # s.add_dependency "jquery-rails"
 
-  s.add_development_dependency "shoulda", ">= 2.11.3"
+  s.add_dependency 'will_paginate', '~> 3.0'
+  s.add_development_dependency "sqlite3"
 end

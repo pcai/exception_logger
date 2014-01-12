@@ -1,10 +1,10 @@
+# Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
-require File.expand_path(File.dirname(__FILE__) + "/rails_root/config/environment")
-require 'rails/test_help'
 
-require 'exception_logger'
+require File.expand_path("../dummy/config/environment.rb",  __FILE__)
+require "rails/test_help"
 
-begin
-  require 'redgreen'
-rescue LoadError
-end
+Rails.backtrace_cleaner.remove_silencers!
+
+# Load support files
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

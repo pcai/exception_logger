@@ -1,21 +1,7 @@
 module ExceptionLogger
   class LoggedException < ActiveRecord::Base
-	
-	attr_protected :id
-    
-	# FIXME
-    self.table_name = "logged_exceptions"
-
     class << self
-      def create_from_exception(controller, exception, data, user)
-        uid = if user.nil?
-          nil
-        elsif user.respond_to?(:id)
-          user.id
-        else
-          nil
-        end
-
+      def create_from_exception(controller, exception, data)
         message = exception.message.inspect
         message << "\n* Extra Data\n\n#{data}" unless data.blank?
         e = create! \
@@ -24,10 +10,9 @@ module ExceptionLogger
           :action_name     => controller.action_name,
           :message         => message,
           :backtrace       => exception.backtrace,
-          :request         => controller.request,
-          :user_id         => uid
+          :request         => controller.request
       end
-      
+
       def host_name
         `hostname -s`.chomp
       end
@@ -37,14 +22,14 @@ module ExceptionLogger
     scope :by_controller_and_action, lambda {|controller_name, action_name| where(:controller_name => controller_name, :action_name => action_name)}
     scope :by_controller, lambda {|controller_name| where(:controller_name => controller_name)}
     scope :by_action, lambda {|action_name| where(:action_name => action_name)}
-    scope :message_like, lambda {|query|  where("message like ?", "%#{query}%")}
-    scope :days_old, lambda {|day_number| where("created_at >= ?", day_number.to_f.days.ago.utc)}
-    scope :sorted, order("created_at desc")
-    
+    scope :message_like, lambda {|query|  where('message like ?', "%#{query}%")}
+    scope :days_old, lambda {|day_number| where('created_at >= ?', day_number.to_f.days.ago.utc)}
+    scope :sorted, lambda { order('created_at DESC') }
+
     def name
       "#{self.exception_class} in #{self.controller_action}"
     end
-    
+
     def backtrace=(trace)
       trace = sanitize_backtrace(trace) * "\n" unless trace.is_a?(String)
       write_attribute :backtrace, trace
@@ -59,7 +44,7 @@ module ExceptionLogger
           env << '* ' + ("%-*s: %s" % [max.length, key, request.env[key].to_s.strip])
         end
         write_attribute(:environment, (env << "* Process: #{$$}" << "* Server : #{self.class.host_name}") * "\n")
-        
+
         write_attribute(:request, [
             "* URL:#{" #{request.method.to_s.upcase}" unless request.get?} #{request.protocol}#{request.env["HTTP_HOST"]}#{request.fullpath}",
             "* Format: #{request.format.to_s}",
@@ -76,13 +61,12 @@ module ExceptionLogger
     def self.class_names
       select("DISTINCT exception_class").order(:exception_class).collect(&:exception_class)
     end
-    
+
     def self.controller_actions
       select("DISTINCT controller_name, action_name").order(:controller_name,:action_name).collect(&:controller_action)
     end
-    
-    private
 
+    private
     @@rails_root      = Pathname.new(Rails.root).cleanpath.to_s
     @@backtrace_regex = /^#{Regexp.escape(@@rails_root)}/
 

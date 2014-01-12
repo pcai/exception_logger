@@ -2,8 +2,8 @@ module ExceptionLogger
   module LoggedExceptionsHelper
     def pretty_exception_date(exception)
       if Date.today == exception.created_at.to_date
-        if exception.created_at > Time.now - 4.hours
-          "#{time_ago_in_words(exception.created_at).gsub(/about /,"~ ")} ago"
+        if false # exception.created_at > Time.now - 4.hours
+          "#{time_ago_in_words(exception.created_at).gsub(/about /,"~ ")} agox"
         else
           "Today, #{exception.created_at.strftime(Time::DATE_FORMATS[:exc_time])}"
         end
@@ -11,11 +11,11 @@ module ExceptionLogger
         exception.created_at.strftime(Time::DATE_FORMATS[:exc_date])
       end
     end
-    
+
     def filtered?
       [:query, :date_ranges_filter, :exception_names_filter, :controller_actions_filter].any? { |p| params[p] }
     end
-    
+
     def listify(text)
       list_items = text.scan(/^\s*\* (.+)/).map {|match| content_tag(:li, match.first) }
       content_tag(:ul, list_items)
@@ -36,20 +36,6 @@ module ExceptionLogger
         textilize(text).html_safe
       rescue
         simple_format(text).html_safe
-      end
-    end
-
-    def user_name(id)
-	  return "" if id.blank?
-      begin
-        klass = ExceptionLogger::LoggedExceptionsController.creator_class.constantize
-        record = klass.find(id)
-        fn = ExceptionLogger::LoggedExceptionsController.creator_name
-        if record.respond_to?(fn)
-          return record.send(fn.to_sym)
-        end
-      rescue
-        return ""
       end
     end
   end

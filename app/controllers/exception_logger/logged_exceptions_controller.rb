@@ -1,28 +1,10 @@
 module ExceptionLogger
   class LoggedExceptionsController < ApplicationController
-    
-    cattr_accessor :application_name,
-                   # A string representation of a method or property that contains 
-                   # a reference to the model instance that should be considered 
-                   # the Creator of the exception 
-                   #
-                   # Examples:
-                   #   self.creator = "User.current"
-                   #   self.creator = "current_user"
-                   :creator,
-				   
-				   # creator's class.
-				   :creator_class,
-				   
-                   # A method that can be used to return a string value to
-                   # be used by the views to display the Creator's information
-                   #
-                   # Examples:
-                   #   self.creator_name = "full_name"
-                   #
-                   # Note that the class that :creator belongs to should respond
-                   # to the method defined in :creator_name
-                   :creator_name
+    layout 'exception_logger/application'
+
+    cattr_accessor :application_name
+
+    helper_method :params_filters
 
     #ApplicationController.class_eval do
     #  rescue_from Exception, :with => :log_exception_handler
@@ -35,33 +17,34 @@ module ExceptionLogger
     end
 
     def query
-      @exceptions = LoggedException.page(params[:page]).per_page(25).sorted
+      exceptions = LoggedException.sorted
       unless params[:id].blank?
-        @exceptions = @exceptions.where(:id => params[:id])
+        exceptions = exceptions.where(:id => params[:id])
       end
       unless params[:query].blank?
-        @exceptions = @exceptions.message_like(params[:query])
+        exceptions = exceptions.message_like(params[:query])
       end
       unless params[:date_ranges_filter].blank?
-        @exceptions = @exceptions.days_old(params[:date_ranges_filter])
+        exceptions = exceptions.days_old(params[:date_ranges_filter])
       end
       unless params[:exception_names_filter].blank?
-        @exceptions = @exceptions.by_exception_class(params[:exception_names_filter])
+        exceptions = exceptions.by_exception_class(params[:exception_names_filter])
       end
       unless params[:controller_actions_filter].blank?
         c_a_params = params[:controller_actions_filter].split('/')
         controller_filter = c_a_params.first.underscore
         action_filter = c_a_params.last.downcase
-        @exceptions = @exceptions.by_controller(controller_filter)
-        @exceptions = @exceptions.by_action(action_filter)
+        exceptions = exceptions.by_controller(controller_filter)
+        exceptions = exceptions.by_action(action_filter)
       end
+      @exceptions = exceptions.paginate(:page => params[:page], :per_page => 30)
 
       respond_to do |format|
         format.html { redirect_to :action => 'index' unless action_name == 'index' }
         format.js
       end
     end
-    
+
     def feed
       @exceptions = LoggedException.all
 
@@ -72,7 +55,7 @@ module ExceptionLogger
 
     def show
       @exception = LoggedException.where(:id => params[:id]).first
-      
+
       respond_to do |format|
         format.js
         format.html
@@ -86,11 +69,25 @@ module ExceptionLogger
 
     def destroy_all
       LoggedException.delete_all(:id => params[:ids]) unless params[:ids].blank?
-      query 
+      query
+    end
+
+    def clear
+      LoggedException.delete_all
+      redirect_to :back
     end
 
     private
-    
+
+    def params_filters
+      {
+        :query => params[:query],
+        :date_ranges_filter => params[:date_ranges_filter],
+        :exception_names_filter => params[:exception_names_filter],
+        :controller_actions_filter => params[:controller_actions_filter],
+      }
+    end
+
     def access_denied_with_basic_auth
       headers["Status"]           = "Unauthorized"
       headers["WWW-Authenticate"] = %(Basic realm="Web Password")
